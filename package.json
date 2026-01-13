@@ -1,0 +1,13 @@
+{
+  "name": "E-commerence",
+  "version": "1.0.0",
+  "main": "server.js",
+  "author": "Muhammad Noman",
+  "license": "MIT",
+  "scripts": {
+    "dev": "concurrently \"npm start --prefix Backend\" \"npm run dev --prefix frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
