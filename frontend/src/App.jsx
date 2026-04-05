@@ -9,7 +9,7 @@ import {
 import { useSelector } from "react-redux";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
-import Home from "./pages/Home/Home";
+import Home from "./pages/Home/index";
 import Products from "./pages/Products/Products";
 import Cart from "./pages/Cart/Cart";
 import Checkout from "./pages/Checkout/Checkout";

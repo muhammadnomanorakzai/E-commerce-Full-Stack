@@ -3,9 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../../redux/slices/productSlice";
 import Navbar from "../../components/Layout/Navbar";
+import Footer from "../../components/Layout/Footer";
 import ProductCard from "../../components/Product/ProductCard";
 import Loader from "../../components/UI/Loader";
-import { FiFilter, FiSearch, FiX } from "react-icons/fi";
+import { FiFilter, FiSearch, FiX, FiSliders } from "react-icons/fi";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ const Products = () => {
   // Initialize searchTerm from URL
   const [searchTerm, setSearchTerm] = useState(getSearchQuery());
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -72,167 +74,199 @@ const Products = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-64">
-            <Loader />
-          </div>
+        <div className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-16 flex justify-center items-center">
+          <Loader />
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <Navbar />
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            All Products
-          </h1>
-          <p className="text-gray-600">
-            Browse our collection of amazing products
-          </p>
+      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-slate-200">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+              Our Collection
+            </h1>
+            <p className="text-slate-500 text-lg">
+              Explore premium products curated just for you.
+            </p>
+          </div>
+          <div className="mt-4 md:mt-0 text-sm font-medium text-slate-500 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
+            Showing <span className="text-slate-900 font-bold">{filteredProducts.length}</span> results
+          </div>
         </div>
 
-        {/* Search Results Message */}
-        {getSearchQuery() && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-center justify-between">
-              <p className="text-blue-700">
-                Search results for: "
-                <span className="font-semibold">{getSearchQuery()}</span>"
-              </p>
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  navigate("/products");
-                }}
-                className="flex items-center text-blue-500 hover:text-blue-700 text-sm">
-                <FiX className="mr-1" />
-                Clear search
-              </button>
-            </div>
+        <div className="flex flex-col lg:flex-row lg:space-x-8">
+          
+          {/* Mobile Filter Toggle */}
+          <div className="lg:hidden mb-4">
+            <button 
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="w-full flex items-center justify-center space-x-2 py-3 bg-white border border-slate-200 rounded-xl shadow-sm text-slate-700 font-medium"
+            >
+              <FiSliders className="w-5 h-5" />
+              <span>{showMobileFilters ? "Hide Filters" : "Show Filters"}</span>
+            </button>
           </div>
-        )}
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <form
-            onSubmit={handleSearch}
-            className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search products by name, description, or category..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {searchTerm && (
+          {/* Sidebar / Filters */}
+          <aside className={`lg:w-64 flex-shrink-0 ${showMobileFilters ? "block" : "hidden lg:block"} mb-8 lg:mb-0`}>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-28">
+              <h2 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
+                <FiFilter className="mr-2 text-blue-600" /> Filters
+              </h2>
+
+              <form onSubmit={handleSearch} className="space-y-6">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Search</label>
+                  <div className="relative">
+                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Keywords..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    />
+                    {searchTerm && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchTerm("");
+                          navigate("/products");
+                        }}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <FiX className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Category Filter */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Category</label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        id="cat-all"
+                        name="category"
+                        value=""
+                        checked={categoryFilter === ""}
+                        onChange={(e) => setCategoryFilter(e.target.value)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <label htmlFor="cat-all" className="ml-3 text-sm text-slate-600 hover:text-slate-900 cursor-pointer">
+                        All Categories
+                      </label>
+                    </div>
+                    {categories.map((category) => (
+                      <div key={category} className="flex items-center">
+                        <input
+                          type="radio"
+                          id={`cat-${category}`}
+                          name="category"
+                          value={category}
+                          checked={categoryFilter === category}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        />
+                        <label htmlFor={`cat-${category}`} className="ml-3 text-sm text-slate-600 hover:text-slate-900 cursor-pointer">
+                          {category}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search Button */}
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-blue-600 transition-colors duration-300 shadow-sm">
+                  Apply Filters
+                </button>
+
+                {/* Clear Filters Button */}
+                {(searchTerm || categoryFilter) && (
                   <button
                     type="button"
-                    onClick={() => {
-                      setSearchTerm("");
-                      navigate("/products");
-                    }}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    <FiX />
+                    onClick={handleClearFilters}
+                    className="w-full py-2.5 text-slate-600 font-medium bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors duration-300">
+                    Clear All
+                  </button>
+                )}
+              </form>
+            </div>
+          </aside>
+
+          {/* Product Grid Area */}
+          <div className="flex-1">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center">
+                <span className="mr-2">⚠️</span> {error}
+              </div>
+            )}
+
+            {/* Current Search Status */}
+            {getSearchQuery() && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-between shadow-sm">
+                <p className="text-sm font-medium text-blue-800">
+                  Search results for: <span className="font-bold">"{getSearchQuery()}"</span>
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    navigate("/products");
+                  }}
+                  className="text-white bg-blue-600 hover:bg-blue-700 w-6 h-6 rounded-full flex items-center justify-center transition-colors">
+                  <FiX className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Products Grid */}
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <FiSearch className="h-10 w-10 text-slate-300" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                  No products found
+                </h3>
+                <p className="text-slate-500 mb-8 max-w-sm mx-auto">
+                  We couldn't find what you're looking for. Try adjusting your search keywords or filters.
+                </p>
+                {(searchTerm || categoryFilter) && (
+                  <button
+                    onClick={handleClearFilters}
+                    className="px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+                    Clear All Filters
                   </button>
                 )}
               </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex items-center space-x-2">
-              <FiFilter className="text-gray-400" />
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 lg:gap-8">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product._id} product={product} />
                 ))}
-              </select>
-            </div>
-
-            {/* Search Button */}
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-              Search
-            </button>
-
-            {/* Clear Filters Button */}
-            {(searchTerm || categoryFilter) && (
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md">
-                Clear All
-              </button>
+              </div>
             )}
-          </form>
+            
+          </div>
         </div>
+      </main>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-            {error}
-          </div>
-        )}
-
-        {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">😕</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              No products found
-            </h3>
-            <p className="text-gray-500 mb-4">
-              {searchTerm || categoryFilter
-                ? "Try adjusting your search or filter"
-                : "No products available in the store"}
-            </p>
-            {(searchTerm || categoryFilter) && (
-              <button
-                onClick={handleClearFilters}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                Clear All Filters
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-
-            {/* Products Count */}
-            <div className="mt-8 text-center text-gray-600">
-              Showing {filteredProducts.length} of {products.length} products
-              {(searchTerm || categoryFilter) && (
-                <button
-                  onClick={handleClearFilters}
-                  className="ml-4 text-blue-600 hover:text-blue-800">
-                  Show all products
-                </button>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+      <Footer />
     </div>
   );
 };
